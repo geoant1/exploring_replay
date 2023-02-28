@@ -1,0 +1,11 @@
+num_y_states = 2
+num_x_states = 5
+num_actions = 4
+goal_coords = [[0, 0], [0, 4]]
+start_coords = [1, 2]
+rew_value = [0, 1]
+blocked_state_actions = [[[7, 0], [2, 1]]]
+uncertain_states_actions = [[[7, 0]]]
+nan_states = [5, 6, 8, 9]
+env_name = 't'
+barriers = [0]
