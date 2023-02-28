@@ -4,4 +4,3 @@ data/
 actual_paper/
 .DS_store
 .ipynb_checkpoints
-./bandit
