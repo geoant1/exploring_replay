@@ -2,3 +2,6 @@ archive/
 rldm2022/
 data/
 actual_paper/
+.DS_store
+.ipynb_checkpoints
+./bandit
