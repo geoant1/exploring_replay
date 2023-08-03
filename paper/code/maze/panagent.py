@@ -92,7 +92,7 @@ class PanAgent():
         '''
 
         if inv_temp == None:
-            inv_temp = self.gain_beta
+            inv_temp = self.beta
         
         probs_before = self._policy(q_before, temp=inv_temp)
         probs_after  = self._policy(q_after, temp=inv_temp)
@@ -108,7 +108,7 @@ class PanAgent():
         '''
 
         if inv_temp == None:
-            inv_temp = self.need_beta
+            inv_temp = self.beta
 
         Ts = np.zeros((self.num_states, self.num_states))
         for s in range(self.num_states):

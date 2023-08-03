@@ -185,7 +185,7 @@ def plot_maze(ax, Q, agent, move=None, colorbar=True, colormap='Blues'):
     
     # arrows for actions
     patches = []
-    for st in np.delete(range(agent.num_states), agent.goal_states + agent.nan_states):
+    for st in np.delete(range(agent.num_states), [agent.goal_state] + agent.nan_states):
         for ac in range(4):
             if ~np.isnan(Q[st, ac]):
                 if Q[st, ac] == 0:
@@ -214,7 +214,7 @@ def plot_maze(ax, Q, agent, move=None, colorbar=True, colormap='Blues'):
     # goal_y, goal_x   = np.argwhere(np.arange(agent.num_states).reshape(agent.num_y_states, agent.num_x_states) == agent.goal_state).flatten()
     # ax.scatter(goal_x+0.5, agent.num_y_states - goal_y -0.5, s=300, c='orange', marker=r'$\clubsuit$', alpha=0.7)
 
-    for (goal_y, goal_x) in agent.goal_coords:
+    for (goal_y, goal_x) in [agent.goal_coords]:
         ax.scatter(goal_x+0.5, agent.num_y_states - goal_y -0.5, s=600, c='orange', marker=r'$\clubsuit$', alpha=0.7)
 
     # agent location
@@ -297,13 +297,13 @@ def plot_need(ax, need, agent, colorbar=True, colormap='Blues', normalise=True, 
         need_plot = need_plot/np.nanmax(need_plot)
 
     if np.all(need_plot == 0):
-        sns.heatmap(need_plot, cmap=['white'], annot=False, fmt='.3f', cbar=colorbar, ax=ax, vmin=vmin, vmax=vmax)
+        sns.heatmap(need_plot, cmap=['white'], annot=False, fmt='.2f', cbar=colorbar, ax=ax, vmin=vmin, vmax=vmax)
     else:
-        sns.heatmap(need_plot, cmap=colormap, annot=True, fmt='.3f', cbar=colorbar, ax=ax, vmin=vmin, vmax=vmax)
+        sns.heatmap(need_plot, cmap=colormap, annot=True, fmt='.2f', cbar=colorbar, ax=ax, vmin=vmin, vmax=vmax)
     
     # arrows for actions
     patches = []
-    for st in np.delete(range(agent.num_states), agent.goal_states + agent.nan_states):
+    for st in np.delete(range(agent.num_states), [agent.goal_state] + agent.nan_states):
         for ac in range(4):
             for bidx, l in enumerate(agent.uncertain_states_actions):
                 if [st, ac] in l:
@@ -331,7 +331,7 @@ def plot_need(ax, need, agent, colorbar=True, colormap='Blues', normalise=True, 
 
     # goal symbol
     # goal_y, goal_x   = np.argwhere(np.arange(agent.num_states).reshape(agent.num_y_states, agent.num_x_states) == agent.goal_state).flatten()
-    for (goal_y, goal_x) in agent.goal_coords:
+    for (goal_y, goal_x) in [agent.goal_coords]:
         ax.scatter(goal_x+0.5, agent.num_y_states - goal_y -0.5, s=600, c='orange', marker=r'$\clubsuit$', alpha=0.7)
 
     ax.set_xticks([])

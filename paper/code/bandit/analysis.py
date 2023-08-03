@@ -23,7 +23,7 @@ def plot_root_values(data_folder):
 
     v_full = np.max(tree.full_updates()[0][0])
 
-    plt.figure(figsize=(2, 5), dpi=100, constrained_layout=True)
+    plt.figure(figsize=(6, 5), dpi=100, constrained_layout=True)
     
     for i in [1, 2]:
         plt.subplot(2, 1, i)
@@ -45,7 +45,7 @@ def plot_root_values(data_folder):
             plt.xticks(range(len(root_values)), range(len(root_values)), fontsize=10)
         
         plt.xlim(0, len(qval_history)-1)
-        plt.ylim(0, v_full+0.1)
+        plt.ylim(0, v_full+2)
         plt.legend(prop={'size':9})
 
     plt.savefig(os.path.join(data_folder, 'root_values.png'))
@@ -128,7 +128,7 @@ def analyse(data_path):
     S     = np.zeros(num_trees)
     N     = np.zeros((num_trees, 2))
 
-    for t in range(num_trees):
+    for t in range(num_trees+1):
         
         this_folder_seqs   = os.path.join(data_path, str(t), 'seqs')
         this_folder_noseqs = os.path.join(data_path, str(t), 'noseqs')

@@ -16,8 +16,6 @@ class AgentPOMDP(PanAgent, Environment):
         panagent parameters:
             alpha          -- on-line MF learning rate
             beta           -- inverse temperature
-            gain_beta      -- inverse temperature for gain
-            need_beta      -- inverse temperature for need
             gamma          -- discount factor
             policy_type    -- 'softmax'/'greedy'
             mf_forget      -- MF forgetting rate
@@ -124,7 +122,7 @@ class AgentPOMDP(PanAgent, Environment):
                 
                 # choose an action to perform at this belief state
                 qvals = q[s, :]
-                probs = self._policy(qvals, temp=self.need_beta)
+                probs = self._policy(qvals, temp=self.beta)
                 a     = np.random.choice(range(self.num_actions), p=probs)
                 
                 # check whether the subject is uncertain about this action outcome
@@ -373,7 +371,7 @@ class AgentPOMDP(PanAgent, Environment):
         T = np.zeros((self.num_states, self.num_states))
         for s in range(self.num_states):
             qvals = Q[s, :]
-            probs = self._policy(qvals, temp=self.need_beta)
+            probs = self._policy(qvals, temp=self.beta)
             for a in range(self.num_actions):
                 T[s, :] += probs[a] * Ta[s, a, :]
 
@@ -1094,8 +1092,6 @@ class AgentMDP(PanAgent, Environment):
             os.makedirs(self.save_path)
         else:
             self.save_path = None
-
-        # replay = False
 
         for move in range(num_steps):
             

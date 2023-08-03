@@ -43,8 +43,8 @@ class Environment():
         if s in self.goal_states:
             return self.start_state, self.config.ravel()[s]
 
-        if self._check_blocked([s, a]) is not None:
-            return s, self.config.ravel()[s]
+        # if self._check_blocked([s, a]) is not None:
+        #     return s, self.config.ravel()[s]
 
         if s in self.nan_states:
             return s, 0
@@ -182,7 +182,7 @@ class Environment():
             delta = np.nanmax(diff[:])
             Q_MB  = Q_MB_new
 
-        return Q_MB_new
+        return Q_MB
 
     def _check_uncertain(self, sa: list):
 
