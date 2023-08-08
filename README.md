@@ -26,6 +26,9 @@ matplotlib
 seaborn
 scipy
 ```
+## Latex dependencies
+The bandit visualisations were done by writing Latex files using custom Python code (all present within this repository). To create pdf visualisations of the trees as shown in the paper, use `pdflatex tex_file_name.tex` where the latter is the name of the file.
+
 # Installation guide
 ## Install from github
 `git clone https://github.com/geoant1/exploring_replay.git`
