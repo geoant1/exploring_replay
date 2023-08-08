@@ -25,3 +25,6 @@ scipy
 # Installation guide
 ## Install from github
 `git clone https://github.com/geoant1/exploring_replay.git`
+
+# License
+This projected is covered by the **MIT license**
