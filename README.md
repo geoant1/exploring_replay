@@ -1,4 +1,4 @@
-**This is code for the paper 'Exploring Replay'**
+# Exploring replay
 
 The repository is structured as follows:
 - `paper/code` contains all models and maze configurations 
