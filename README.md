@@ -4,6 +4,7 @@
 
 - [Overview](#overview)
 - [Software requirements](#software)
+- [Installation guide](#install)
 
 # Overview
 The repository is structured as follows:
@@ -21,3 +22,6 @@ matplotlib
 seaborn
 scipy
 ```
+# Installation guide
+## Install from github
+`git clone https://github.com/geoant1/exploring_replay.git`
