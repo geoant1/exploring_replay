@@ -3,8 +3,9 @@
 ## Contents
 
 - [Overview](#overview)
-- [Software requirements](#software)
-- [Installation guide](#install)
+- [Software requirements](#software-requirements)
+- [Installation guide](#installation-guide)
+- [License](#lisense)
 
 # Overview
 The repository is structured as follows:
