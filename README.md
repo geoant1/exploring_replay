@@ -15,9 +15,9 @@ The repository is structured as follows:
 The code was developed and tested on Linux Manjaro (5.10.186-1)
 ## Python dependencies 
 All the code was written in `Python 3.9.5` with the following external packages: 
-`
+```
 numpy 
 matplotlib
 seaborn
 scipy
-`
+```
