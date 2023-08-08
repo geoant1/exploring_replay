@@ -2,7 +2,6 @@
 This repository containes code and data for the paper 'Exploring replay' currently under review.
 
 ## Contents
-
 - [Overview](#overview)
 - [Software requirements](#software-requirements)
 - [Installation guide](#installation-guide)
@@ -10,8 +9,11 @@ This repository containes code and data for the paper 'Exploring replay' current
 
 # Overview
 The repository is structured as follows:
-- `paper/code` contains all models and maze configurations 
-- `paper/figures_code` contains scripts which can be run to generate the data and any individual figure in the manuscript
+- `paper/code` contains all models and maze configurations
+- - `paper/code/bandit` contains code for the bandit simulations
+  - `paper/code/maze` contains code for the Tolman maze simulations
+  - `paper/code/mazes` contains maze configurations
+- `paper/figures_code` contains scripts which can be run to generate the data and any individual figure in the manuscript. Each individual figure has its own folder. Note that the figures were additionally assembled using Inkscape.
 
 # Software requirements
 ## OS requirements
