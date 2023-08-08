@@ -1,4 +1,5 @@
 # Exploring replay
+This repository containes code and data for the paper 'Exploring replay' currently under review.
 
 ## Contents
 
