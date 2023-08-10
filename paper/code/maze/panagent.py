@@ -31,7 +31,7 @@ class PanAgent():
 
         return None
 
-    def _policy(self, q_vals, temp=None):
+    def _policy(self, q_vals):
 
         '''
         ----
@@ -56,18 +56,13 @@ class PanAgent():
                     probs = np.insert(probs, nan_idx, 0)
             return probs
 
-        if temp is not None:
-            t = temp
-        else:
-            t = self.beta
-
-        if t != 'greedy':
-            probs = np.exp(q_vals_allowed*t)/np.sum(np.exp(q_vals_allowed*t))
+        if self.beta != 'greedy':
+            probs = np.exp(q_vals_allowed*self.beta)/np.sum(np.exp(q_vals_allowed*self.beta))
             if len(nan_idcs) > 0:
                 for nan_idx in nan_idcs:
                     probs = np.insert(probs, nan_idx, 0)
             return probs
-        elif t == 'greedy':
+        elif self.beta == 'greedy':
             if np.all(q_vals_allowed == q_vals_allowed.max()):
                 ps           = np.ones(self.num_actions)
                 ps[nan_idcs] = 0
@@ -83,23 +78,20 @@ class PanAgent():
         else:
             raise KeyError('Unknown policy type')
 
-    def _compute_gain(self, q_before, q_after, inv_temp=None):
+    def _compute_gain(self, q_before, q_after):
 
         '''
         ---
         Compute gain associated with each replay update
         ---
         '''
-
-        if inv_temp == None:
-            inv_temp = self.beta
         
-        probs_before = self._policy(q_before, temp=inv_temp)
-        probs_after  = self._policy(q_after, temp=inv_temp)
+        probs_before = self._policy(q_before)
+        probs_after  = self._policy(q_after)
 
         return np.nansum((probs_after-probs_before)*q_after)
 
-    def _compute_need(self, T, Q, inv_temp=None):
+    def _compute_need(self, T, Q):
         
         '''
         ---
@@ -107,12 +99,9 @@ class PanAgent():
         ---
         '''
 
-        if inv_temp == None:
-            inv_temp = self.beta
-
         Ts = np.zeros((self.num_states, self.num_states))
         for s in range(self.num_states):
-            probs = self._policy(Q[s, :], temp=inv_temp)
+            probs = self._policy(Q[s, :])
             for a in range(self.num_actions):
                 Ts[s, :] += probs[a]*T[s, a, :]
         

@@ -17,7 +17,6 @@ class AgentPOMDP(PanAgent, Environment):
             alpha          -- on-line MF learning rate
             beta           -- inverse temperature
             gamma          -- discount factor
-            policy_type    -- 'softmax'/'greedy'
             mf_forget      -- MF forgetting rate
 
         agent parameters:
@@ -122,7 +121,7 @@ class AgentPOMDP(PanAgent, Environment):
                 
                 # choose an action to perform at this belief state
                 qvals = q[s, :]
-                probs = self._policy(qvals, temp=self.beta)
+                probs = self._policy(qvals)
                 a     = np.random.choice(range(self.num_actions), p=probs)
                 
                 # check whether the subject is uncertain about this action outcome
@@ -371,7 +370,7 @@ class AgentPOMDP(PanAgent, Environment):
         T = np.zeros((self.num_states, self.num_states))
         for s in range(self.num_states):
             qvals = Q[s, :]
-            probs = self._policy(qvals, temp=self.beta)
+            probs = self._policy(qvals)
             for a in range(self.num_actions):
                 T[s, :] += probs[a] * Ta[s, a, :]
 
@@ -684,7 +683,10 @@ class AgentPOMDP(PanAgent, Environment):
                                         # evb    = gain*need
 
                                         gain, evb  = self._generalised_gain(s, a, Q_old, Q_new, nbtree)
+                                        # gain = self._compute_gain(Q_new[s, :], Q_new[s, :])
+                                        # need = self.pneed_tree[hor][k]
 
+                                        # evb  = gain*need
                                         # gain, evb = self._generalised_gain(state, a, pntree, Q_old_this, Q_new_this)
                                         
                                         if evb >= self.xi:
@@ -772,7 +774,8 @@ class AgentPOMDP(PanAgent, Environment):
                     gain, evb  = self._generalised_gain(state, a, Q_old_this, Q_new_this, self.belief_tree) # gain & evb associated with the update
 
                     # add to the list of potential updates
-                    updates += [[np.array([hi]), np.array([idx]), np.array([state, a]).reshape(-1, 2), Q_new_this.copy(), [gain], [self.pneed_tree], [evb]]]
+                    if evb >= self.xi:
+                        updates += [[np.array([hi]), np.array([idx]), np.array([state, a]).reshape(-1, 2), Q_new_this.copy(), [gain], [self.pneed_tree], [evb]]]
 
         return updates
 
@@ -812,6 +815,9 @@ class AgentPOMDP(PanAgent, Environment):
         while True:
             updates = self._generate_single_updates()
 
+            if len(updates) == 0:
+                break 
+            
             if self.sequences:
                 fwd_updates  = self._generate_forward_sequences(updates)
                 rev_updates  = self._generate_reverse_sequences(updates)
@@ -893,7 +899,7 @@ class AgentPOMDP(PanAgent, Environment):
             s      = self.state
 
             # choose action and receive feedback
-            probs  = self._policy(self.Q[s, :], temp=self.beta)
+            probs  = self._policy(self.Q[s, :])
             a      = np.random.choice(range(self.num_actions), p=probs)
 
             bidx = self._check_uncertain([s, a])
@@ -1093,6 +1099,8 @@ class AgentMDP(PanAgent, Environment):
         else:
             self.save_path = None
 
+        # replay = False
+
         for move in range(num_steps):
             
             if move >= 3000:
@@ -1103,7 +1111,7 @@ class AgentMDP(PanAgent, Environment):
             s      = self.state
 
             # choose action and receive feedback
-            probs  = self._policy(self.Q[s, :], temp=self.beta)
+            probs  = self._policy(self.Q[s, :])
             a      = np.random.choice(range(self.num_actions), p=probs)
 
             bidx   = self._check_blocked([s, a])

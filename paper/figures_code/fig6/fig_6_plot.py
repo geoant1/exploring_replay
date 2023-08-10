@@ -53,8 +53,8 @@ def main(save_folder):
     ax7.set_title(r'Updated policy', fontsize=16)
     ax7.text(-0.1, 1.1, 'F', transform=ax7.transAxes, fontsize=16, fontweight='bold', va='top', ha='right')
 
-    plt.savefig(os.path.join(save_folder, 'fig6.png'))
-    plt.savefig(os.path.join(save_folder, 'fig6.svg'), transparent=True)
+    plt.savefig(os.path.join(save_folder, 'fig_6.png'))
+    plt.savefig(os.path.join(save_folder, 'fig_6.svg'), transparent=True)
     plt.close()
 
     return None

@@ -6,7 +6,7 @@ from utils import plot_maze, plot_need
 
 data_path   = os.path.abspath(os.path.join(sys.path[0], '../../figures/fig3'))
 
-with open(os.path.join(data_path, 'data', 'no_forgetting', '0', 'ag.pkl'), "rb") as f:
+with open(os.path.join(data_path, 'data', '0', 'ag.pkl'), "rb") as f:
     agent = pickle.load(f)
 
 G = np.load(os.path.join(data_path, 'gain.npy'))
@@ -58,8 +58,8 @@ def main():
     plot_need(ax6, N[1], agent, colormap='Oranges')
     ax6.text(-0.1, 1.1, 'F', transform=ax6.transAxes, fontsize=16, fontweight='bold', va='top', ha='right')
 
-    plt.savefig(os.path.join(data_path, 'fig1.png'))
-    plt.savefig(os.path.join(data_path, 'fig1.svg'), transparent=True)
+    plt.savefig(os.path.join(data_path, 'fig_3.png'))
+    plt.savefig(os.path.join(data_path, 'fig_3.svg'), transparent=True)
     plt.close()
 
     return None

@@ -43,8 +43,8 @@ class Environment():
         if s in self.goal_states:
             return self.start_state, self.config.ravel()[s]
 
-        # if self._check_blocked([s, a]) is not None:
-        #     return s, self.config.ravel()[s]
+        if (self._check_blocked([s, a]) is not None) and (unlocked == False):
+            return s, self.config.ravel()[s]
 
         if s in self.nan_states:
             return s, 0
@@ -136,19 +136,21 @@ class Environment():
             for s in self.nan_states:
                 self.Q[s, :] = np.nan
 
-        if self.env_name == 'tolman1':
-            self.Q[8,  1] = np.nan
-        elif self.env_name == 'tolman2':
-            self.Q[20, 1] = np.nan
-        elif self.env_name == 'tolman3':
-            self.Q[8,  3] = np.nan
-        elif self.env_name == 'u':
-            self.Q[1,  2] = np.nan
-        elif self.env_name == 'tolman123_nocheat':
+        # if self.env_name == 'tolman1':
+        #     self.Q[8,  1] = np.nan
+        # elif self.env_name == 'tolman2':
+        #     self.Q[20, 1] = np.nan
+        # elif self.env_name == 'tolman3':
+        #     self.Q[8,  3] = np.nan
+        # elif self.env_name == 'u':
+        #     self.Q[1,  2] = np.nan
+        if self.env_name == 'tolman123_nocheat':
             self.Q[8,  1] = np.nan
             self.Q[20, 1] = np.nan
         elif self.env_name == 'tolman1234':
             self.Q[8, 1]  = np.nan
+            self.Q[20, 2] = np.nan
+            self.Q[32, 2] = np.nan
         else: pass
 
         self.Q_nans = self.Q.copy()
@@ -166,10 +168,10 @@ class Environment():
         delta = 1
         while delta > eps:
             Q_MB_new = Q_MB.copy()
-            for s in np.delete(range(self.num_states), self.goal_states):
+            for s in np.delete(range(self.num_states), self.goal_states + self.nan_states):
                 for a in range(self.num_actions):
                     if ~np.isnan(Q_MB[s, a]):
-                        bidx = self._check_uncertain([s, a])
+                        bidx = self._check_blocked([s, a])
                         if bidx is not None:
                             if self.barriers[bidx]:
                                 s1, r = self._get_new_state(s, a, unlocked=False)
@@ -182,7 +184,7 @@ class Environment():
             delta = np.nanmax(diff[:])
             Q_MB  = Q_MB_new
 
-        return Q_MB
+        return Q_MB_new
 
     def _check_uncertain(self, sa: list):
 

@@ -12,7 +12,7 @@ env_config     = load_env(env_file_path)
 env_config['barriers'] = [1, 1, 0]
 
 # --- Specify simulation parameters ---
-save_path  = os.path.abspath(os.path.join(sys.path[0], '../../figures/fig3', 'data', 'yes_forgetting'))
+save_path  = os.path.abspath(os.path.join(sys.path[0], '../../figures/fig3', 'data'))
 num_steps  = 4000
 
 # --- Specify agent parameters ---

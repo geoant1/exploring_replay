@@ -8,14 +8,18 @@ save_path   = os.path.abspath(os.path.join(sys.path[0], '../../figures/fig3'))
 num_moves   = 2000
 
 def main(data_folder, save_folder):
-        
-    with open(os.path.join(data_folder, 'yes_forgetting', '0', 'ag.pkl'), "rb") as f:
+    
+    # load the agent config
+    with open(os.path.join(data_folder, '0', 'ag.pkl'), "rb") as f:
         agent = pickle.load(f)
 
-    num_seeds = len([i for i in os.listdir(os.path.join(data_folder, 'yes_forgetting')) if os.path.isdir(os.path.join(data_folder, 'yes_forgetting', i))])
+    num_seeds = len([i for i in os.listdir(os.path.join(data_folder)) if os.path.isdir(os.path.join(data_folder, i))])
 
+    # state occupancy
     S  = [np.zeros((num_seeds, agent.num_states)), np.zeros((num_seeds, agent.num_states))]
+    # gain
     G  = [np.full((num_seeds, num_moves, agent.num_states, agent.num_actions), np.nan), np.full((num_seeds, num_moves, agent.num_states, agent.num_actions), np.nan)]
+    # need
     N  = [np.full((num_seeds, num_moves, agent.num_states), np.nan), np.full((num_seeds, num_moves, agent.num_states), np.nan)]
 
     for idx, bounds in enumerate([[0, num_moves], [num_moves, num_moves*2]]):
@@ -23,7 +27,7 @@ def main(data_folder, save_folder):
         for seed in range(num_seeds):
             for file in range(bounds[0], bounds[1]):
                     
-                data         = np.load(os.path.join(data_folder, 'yes_forgetting', str(seed), 'Q_%u.npz'%file), allow_pickle=True)
+                data         = np.load(os.path.join(data_folder, str(seed), 'Q_%u.npz'%file), allow_pickle=True)
                 move         = data['move']
                 s            = int(move[0])
                 S[idx][seed, s] += 1

@@ -13,21 +13,20 @@ env_config     = load_env(env_file_path)
 # --- Specify agent parameters ---
 pag_config = {
     'alpha'          : 1,
-    'beta'           : 2, 
+    'beta'           : 2,        
     'gamma'          : 0.9,
 }
 
 ag_config = {
     'alpha_r'        : 1,         # offline learning rate
     'horizon'        : 10,        # planning horizon (minus 1)
-    'xi'             : 0.000001,    # EVB replay threshold
+    'xi'             : 0.000001,      # EVB replay threshold
     'num_sims'       : 2000,      # number of MC simulations for need
-    'sequences'      : True,
-    'max_seq_len'    : 8,
+    'sequences'      : False,
     'env_name'       : env,       # gridworld name
 }
 
-save_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/fig6'))
+save_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/fig5'))
 
 def main(save_folder):
 
@@ -38,10 +37,10 @@ def main(save_folder):
 
     np.save(os.path.join(save_folder, 'q_mb.npy'), Q_MB)
 
-    a, b           = 7, 2
-    agent.state    = 38          # start state
-    agent.M        = np.array([[a, b], [0, 1], [1, 0]])
-    agent.Q        = Q_MB.copy() # set MF Q values
+    a, b        = 7, 2
+    agent.state = 38          # start state
+    agent.M     = np.array([[a, b], [0, 1], [1, 0]])
+    agent.Q     = Q_MB.copy() # set MF Q values
     _, gain_history, need_history = agent._replay()
 
     np.save(os.path.join(save_folder, 'q_explore_replay.npy'), agent.Q)
@@ -56,10 +55,10 @@ def main(save_folder):
     np.save(os.path.join(save_folder, 'q_explore_online.npy'), agent.Q)
     np.save(os.path.join(save_folder, 'q_explore_online_diff.npy'), agent.Q-Q_before)
 
-    Q_before       = agent.Q.copy()
+    Q_before    = agent.Q.copy()
 
-    agent.state    = 14
-    agent.M        = np.array([[0, 1], [0, 1], [1, 0]])
+    agent.state = 14
+    agent.M     = np.array([[0, 1], [0, 1], [1, 0]])
     _, gain_history, need_history = agent._replay()
     
     np.save(os.path.join(save_folder, 'gain_history.npy'), gain_history)
