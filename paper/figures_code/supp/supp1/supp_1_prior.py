@@ -7,7 +7,7 @@ import os, sys
 params = [[13, 12], [2, 2], [15, 12], [4, 2], [14, 13], [2, 4]]
 x      = np.linspace(0, 1, 100)
 
-save_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/supp/supp1'))
+save_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp1'))
 
 def main(save_folder):
 

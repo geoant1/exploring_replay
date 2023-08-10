@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys, os, pickle
-sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../code/maze')))
+sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../../code/maze')))
 from utils import plot_maze
 
-load_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/supp/supp3/data/'))
-save_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/supp/supp4'))
+load_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp3/data/'))
+save_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp4'))
 
 def main():
 
@@ -18,6 +18,7 @@ def main():
     probas = np.ones((len(priors), len(betas)))
 
     for idxb, beta in enumerate(betas):
+        agent.beta = beta
         for idxp, prior in enumerate(priors):
 
             this_path = os.path.join(load_path, str(idxb), str(idxp))
@@ -28,7 +29,7 @@ def main():
 
                 s, a = sa[0], sa[1]
 
-                probas[idxp, idxb] *= agent._policy(Q[s, :], temp=beta)[a]
+                probas[idxp, idxb] *= agent._policy(Q[s, :])[a]
 
     fig = plt.figure(figsize=(4, 3), constrained_layout=True, dpi=100)
 

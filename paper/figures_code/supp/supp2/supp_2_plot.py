@@ -1,13 +1,13 @@
 import numpy as np
 import sys, os
-sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../code/bandit')))
+sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../../code/bandit')))
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind, ttest_1samp
 
 # --- Specify parameters ---
 
 # save path
-save_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/supp/supp2/'))
+save_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp2/'))
 
 num_trees = 100
 seqs      = [True, False]
@@ -93,11 +93,6 @@ def main(save_folder):
     with open(os.path.join(save_folder, 'stats.txt'), 'w') as f:
         f.write('Proportion: t=%.2f, p=%.2e\n'%(tp, pp))
         f.write('Number:     t=%.2f, p=%.2e\n'%(tn, pn))
-
-    # plt.bar([0.5], np.nanmean(big_matrix[:, 1]))
-    # plt.scatter([0.5]*big_matrix.shape[0], big_matrix[:, 1])
-
-    # plt.plot(big_matrix[:, 0], big_matrix[:, 1], c='k')
 
     return None
 

@@ -1,7 +1,7 @@
 import numpy as np
 import sys, os, shutil, pickle
 from copy import deepcopy
-sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../code/bandit')))
+sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../../code/bandit')))
 from belief_tree import Tree
 import matplotlib.pyplot as plt
 
@@ -37,7 +37,7 @@ betas     = [1, 2, 4, 'greedy']
 horizons  = [3, 4, 5]
 
 # save path
-save_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/supp/supp1/data/d_f'))
+save_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp1/data/d_f'))
 
 def md_value():
 

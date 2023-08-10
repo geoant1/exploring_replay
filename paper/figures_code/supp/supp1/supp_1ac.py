@@ -1,6 +1,6 @@
 import numpy as np
 import os, shutil, pickle, sys
-sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../code/bandit')))
+sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../../code/bandit')))
 from belief_tree import Tree
 from tex_tree import generate_big_tex_tree
 
@@ -33,7 +33,7 @@ p = {
 }
 
 # save path
-save_folder = os.path.abspath(os.path.join(sys.path[0], '../../figures/supp/supp1/data/a_c'))
+save_folder = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp1/data/a_c'))
 
 # --- Main function for replay ---
 def main(save_path , params, plot_tree=False):

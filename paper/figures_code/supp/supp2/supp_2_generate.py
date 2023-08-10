@@ -1,6 +1,6 @@
 import numpy as np
 import sys, os, shutil, pickle
-sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../code/bandit')))
+sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../../code/bandit')))
 from belief_tree import Tree
 
 # --- Specify parameters ---
@@ -30,7 +30,7 @@ p = {
 }
 
 # save path
-save_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/supp/supp2/data'))
+save_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp2/data'))
 
 # --- Main function for replay ---
 def main(save_folder):

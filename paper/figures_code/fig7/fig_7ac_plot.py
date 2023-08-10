@@ -33,8 +33,8 @@ def main(save_folder):
     ax4.set_title(r'New exploratory policy', fontsize=16)
     ax4.text(-0.1, 1.1, 'C', transform=ax4.transAxes, fontsize=16, fontweight='bold', va='top', ha='right')
 
-    plt.savefig(os.path.join(save_folder, 'fig7.png'))
-    plt.savefig(os.path.join(save_folder, 'fig7.svg'), transparent=True)
+    plt.savefig(os.path.join(save_folder, 'fig_7.png'))
+    plt.savefig(os.path.join(save_folder, 'fig_7.svg'), transparent=True)
     plt.close()
 
     return None

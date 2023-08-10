@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys, os, pickle
-sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../code/maze')))
+sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../../code/maze')))
 from utils import plot_maze, plot_need
 import matplotlib.pyplot as plt
 
-load_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/supp/supp5'))
+load_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp5'))
 
 def main():
 
