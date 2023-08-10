@@ -1,68 +1,70 @@
 import numpy as np
-import sys, os, shutil, pickle
-sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../../code/bandit')))
-from belief_tree import Tree
+import sys, os, pickle, shutil
+sys.path.append(os.path.abspath(os.path.join(sys.path[0], '../../../code/maze')))
+from agent_replay import AgentPOMDP
+from utils import load_env
 
-# --- Specify parameters ---
+np.random.seed(2)
 
-# prior belief at the root
-alpha_0, beta_0 = 13, 12
-alpha_1, beta_1 = 2, 2
+env            = 'tolman123_nocheat'
+env_file_path  = os.path.abspath(os.path.join(sys.path[0], '../../../code/mazes/' + env + '.txt'))
+env_config     = load_env(env_file_path)
 
-M = np.array([
-    [alpha_0, beta_0],
-    [alpha_1, beta_1]
-])
-
-# other parameters
-p = {
-    'arms':           ['unknown', 'unknown'],
-    'root_belief':    M,
-    'rand_init':      True,
-    'gamma':          0.9,
-    'xi':             0.001,
-    'beta':           4,
-    'policy_type':    'softmax',
-    'sequences':      True,
-    'max_seq_len':    None,
-    'constrain_seqs': True,
-    'horizon':        5
+# --- Specify agent parameters ---
+pag_config = {
+    'alpha'          : 1,
+    'beta'           : 2, 
+    'gamma'          : 0.9,
 }
 
-# save path
+ag_config = {
+    'alpha_r'        : 1,         # offline learning rate
+    'horizon'        : 10,        # planning horizon (minus 1)
+    'xi'             : 0.000001,    # EVB replay threshold
+    'num_sims'       : 2000,      # number of MC simulations for need
+    'sequences'      : False,
+    'env_name'       : env,       # gridworld name
+}
+
 save_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp2/data'))
 
-# --- Main function for replay ---
 def main(save_folder):
-    
-    num_trees = 200
 
-    seqs      = [True, False]
+    if os.path.isdir(save_folder):
+        shutil.rmtree(save_folder)
+    os.makedirs(save_folder)
 
-    for seq in seqs:
+    betas  = [1, 2, 4, 'greedy']
+    priors = [[2, 2], [6, 2], [10, 2], [14, 2], [18, 2], [22, 2]]
 
-        np.random.seed(0)
+    env_config['barriers'] = [1, 1, 0]
 
-        for tidx in range(num_trees):
+    for bidx, beta in enumerate(betas):
+        pag_config['beta'] = beta
 
-            this_save_path = os.path.join(save_folder, str(tidx), str(seq), 'replay_data')
+        for pidx, prior in enumerate(priors):
 
-            if os.path.isdir(this_save_path):
-                shutil.rmtree(this_save_path)
-            os.makedirs(this_save_path)
+            this_save_folder = os.path.join(save_folder, str(bidx), str(pidx))
+            os.makedirs(this_save_folder)
 
-            p['sequences'] = seq
-            # initialise the agent
-            tree   = Tree(**p)
-        
-            # do replay
-            q_history, n_history, _, replays = tree.replay_updates()
+            agent = AgentPOMDP(*[pag_config, ag_config, env_config])
+            Q_MB  = agent._solve_mb(1e-5)
 
-            np.save(os.path.join(this_save_path, 'need_history.npy'), n_history)
-            np.save(os.path.join(this_save_path, 'qval_history.npy'), q_history)
-            np.save(os.path.join(this_save_path, 'replay_history.npy'), replays)
+            np.save(os.path.join(this_save_folder, 'q_mb.npy'), Q_MB)
 
-            print('Done with tree %u/%u'%(tidx+1, num_trees))
+            a, b        = prior[0], prior[1]
+            agent.state = 38          # start state
+            agent.M     = np.array([[a, b], [0, 1], [1, 0]])
+            agent.Q     = Q_MB.copy() # set MF Q values
+            Q_history, gain_history, need_history = agent._replay()
+
+            np.save(os.path.join(this_save_folder, 'q_explore_replay.npy'), agent.Q)
+            np.save(os.path.join(this_save_folder, 'q_explore_replay_diff.npy'), agent.Q-Q_MB)
+
+            print('Done with prior %u'%pidx)
+
+            with open(os.path.join(this_save_folder, 'ag.pkl'), 'wb') as f:
+                pickle.dump(agent, f, pickle.HIGHEST_PROTOCOL)
 
     return None
 
