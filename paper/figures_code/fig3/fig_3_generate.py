@@ -20,12 +20,10 @@ pag_config = {
     'alpha'          : 1,
     'beta'           : 10, 
     'gamma'          : 0.9,
-    'policy_type'    : 'softmax',
     'mf_forget'      : 0.05
 }
 
 ag_config = {
-    'alpha_r'        : 1,     # offline learning rate
     'xi'             : 0.001, # EVB replay threshold
     'env_name'       : env,   # gridworld name
 }

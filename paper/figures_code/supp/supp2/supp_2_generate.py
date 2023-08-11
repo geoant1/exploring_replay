@@ -51,15 +51,19 @@ def main(save_folder):
             Q_MB  = agent._solve_mb(1e-5)
 
             np.save(os.path.join(this_save_folder, 'q_mb.npy'), Q_MB)
+            np.savetxt(os.path.join(this_save_folder, 'q_mb.csv'), Q_MB, delimiter=',')
 
             a, b        = prior[0], prior[1]
             agent.state = 38          # start state
             agent.M     = np.array([[a, b], [0, 1], [1, 0]])
             agent.Q     = Q_MB.copy() # set MF Q values
-            Q_history, gain_history, need_history = agent._replay()
+            _, _, _     = agent._replay()
 
             np.save(os.path.join(this_save_folder, 'q_explore_replay.npy'), agent.Q)
+            np.savetxt(os.path.join(this_save_folder, 'q_explore_replay.csv'), agent.Q, delimiter=',')
+
             np.save(os.path.join(this_save_folder, 'q_explore_replay_diff.npy'), agent.Q-Q_MB)
+            np.savetxt(os.path.join(this_save_folder, 'q_explore_replay_diff.csv'), agent.Q-Q_MB, delimiter=',')
 
             print('Done with prior %u'%pidx)
 

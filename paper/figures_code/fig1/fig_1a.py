@@ -25,10 +25,7 @@ p = {
     'gamma':          0.9,
     'xi':             0.0001,
     'beta':           2,
-    'policy_type':    'softmax',
     'sequences':      False,
-    'max_seq_len':    None,
-    'constrain_seqs': True,
     'horizon':        2
 }
 

@@ -36,6 +36,7 @@ def main(save_folder):
     Q_MB  = agent._solve_mb(1e-5)
 
     np.save(os.path.join(save_folder, 'q_mb.npy'), Q_MB)
+    np.savetxt(os.path.join(save_folder, 'q_mb.csv'), Q_MB, delimiter=',')
 
     agent.Q           = Q_MB.copy()
     agent.M           = np.array([[7, 2], [7, 2], [1, 0]])

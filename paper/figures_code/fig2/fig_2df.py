@@ -24,19 +24,16 @@ p = {
     'gamma':          0.9,
     'xi':             0.0001,
     'beta':           2,
-    'policy_type':    'softmax',
     'sequences':      False,
-    'max_seq_len':    None,
-    'constrain_seqs': True,
     'horizon':        3
 }
+
+# save path
+save_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/fig2/data/d_f'))
 
 xis       = np.logspace(np.log2(0.001), np.log2(1), 11, base=2)
 betas     = [1, 2, 4, 'greedy']
 horizons  = [3, 4, 5]
-
-# save path
-save_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/fig2/data/d_f'))
 
 def md_value():
 
@@ -69,6 +66,8 @@ def main(save_folder):
     os.makedirs(save_folder)
 
     md_values = md_value()
+
+    np.savetxt(os.path.join(save_path, 'xis.csv'), xis, delimiter=',')
 
     for hidx, horizon in enumerate(horizons[::-1]):
         # store results here
@@ -165,9 +164,16 @@ def main(save_folder):
 
                 axv.set_xticks([])
                 axp.set_xticks([])
-                
+        
+        np.savetxt(os.path.join(save_folder, 'nreps_%u.csv'%horizon), nreps, delimiter=',')
+        np.savetxt(os.path.join(save_folder, 'root_val_%u.csv'%horizon), R, delimiter=',')
+        np.savetxt(os.path.join(save_folder, 'policy_val_%u.csv'%horizon), P, delimiter=',')
+
+        np.savetxt(os.path.join(save_folder, 'BO_val_%u.csv'%horizon), np.array([v_full]), delimiter=',')
+        np.savetxt(os.path.join(save_folder, 'CE_val_%u.csv'%horizon), np.array([md_values[hidx]]), delimiter=',')
+
         file_name = 'arm1%u_alpha0%u_beta0%u_hor%u'%(M[1], alpha_0, beta_0, horizon)
-        np.save(os.path.join(save_folder, file_name + '.npy'), R)
+        # np.save(os.path.join(save_folder, file_name + '.npy'), R)
         plt.savefig(os.path.join(save_folder, file_name + '.svg'), transparent=True)
         plt.savefig(os.path.join(save_folder, file_name + '.png'))
 

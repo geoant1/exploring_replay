@@ -51,8 +51,16 @@ def main(data_folder, save_folder):
         S[idx]  = np.mean(S[idx],    axis=0)
 
     np.save(os.path.join(save_folder, 'gain.npy'), G)
+    np.savetxt(os.path.join(save_folder, 'gain_2000.csv'), G[0, :], delimiter=',')
+    np.savetxt(os.path.join(save_folder, 'gain_4000.csv'), G[1, :], delimiter=',')
+
     np.save(os.path.join(save_folder, 'need.npy'), N)
+    np.savetxt(os.path.join(save_folder, 'need_2000.csv'), N[0, :], delimiter=',')
+    np.savetxt(os.path.join(save_folder, 'need_4000.csv'), N[1, :], delimiter=',')
+
     np.save(os.path.join(save_folder, 'states.npy'), S)
+    np.savetxt(os.path.join(save_folder, 'states_2000.csv'), S[0, :], delimiter=',')
+    np.savetxt(os.path.join(save_folder, 'states_4000.csv'), S[1, :], delimiter=',')
 
     return None
 

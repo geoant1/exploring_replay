@@ -37,13 +37,14 @@ def main(save_folder):
     Q_MB  = agent._solve_mb(1e-5)
 
     np.save(os.path.join(save_folder, 'q_mb.npy'), Q_MB)
+    np.savetxt(os.path.join(save_folder, 'q_mb.csv'), Q_MB, delimiter=',')
 
-    a1, b1      = 7, 2
-    a2, b2      = 7, 2
-    agent.state = 38          # start state
-    agent.M     = np.array([[a1, b1], [a2, b2]])
-    agent.Q     = Q_MB.copy() # set MF Q values
-    Q_history, gain_history, need_history = agent._replay()
+    a1, b1          = 7, 2
+    a2, b2          = 7, 2
+    agent.state     = 38          # start state
+    agent.M         = np.array([[a1, b1], [a2, b2]])
+    agent.Q         = Q_MB.copy() # set MF Q values
+    Q_history, _, _ = agent._replay()
 
     belief_tree = Q_history[-1]
 
@@ -66,8 +67,19 @@ def main(save_folder):
                 Q2[s, :] = q[s, :].copy()
 
     np.save(os.path.join(save_folder, 'q_explore_replay1.npy'), Q1)
+    np.savetxt(os.path.join(save_folder, 'q_explore_replay1.csv'), Q1, delimiter=',')
+
+    np.save(os.path.join(save_folder, 'q_explore_replay1_diff.npy'), Q1-Q_MB)
+    np.savetxt(os.path.join(save_folder, 'q_explore_replay1_diff.csv'), Q1-Q_MB, delimiter=',')
+
     np.save(os.path.join(save_folder, 'q_explore_replay2.npy'), Q2)
+    np.savetxt(os.path.join(save_folder, 'q_explore_replay2.csv'), Q2, delimiter=',')
+
+    np.save(os.path.join(save_folder, 'q_explore_replay2_diff.npy'), Q2-Q_MB)
+    np.savetxt(os.path.join(save_folder, 'q_explore_replay2_diff.csv'), Q2-Q_MB, delimiter=',')
+
     np.save(os.path.join(save_folder, 'q_explore_replay_diff.npy'), agent.Q-Q_MB)
+    np.savetxt(os.path.join(save_folder, 'q_explore_replay_diff.csv'), agent.Q-Q_MB, delimiter=',')
 
     with open(os.path.join(save_folder, 'ag.pkl'), 'wb') as f:
         pickle.dump(agent, f, pickle.HIGHEST_PROTOCOL)

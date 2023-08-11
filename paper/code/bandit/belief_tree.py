@@ -12,7 +12,6 @@ class Tree:
         root_belief   -- current posterior belief
         root_q_values -- MF Q values at the current state
         policy_temp   -- inverse temperature
-        policy_type   -- softmax / greeedy
         ----
         '''
         
@@ -272,45 +271,6 @@ class Tree:
                     qval_tree[hi][idx][a] = b0*(1.0 + self.gamma*v_primes[0]) + b1*(0.0 + self.gamma*v_primes[1])
 
         return qval_tree
-
-    # def _build_cum_reward_tree(self):
-
-    #     cumreward_tree = {hi:{} for hi in range(self.horizon)}
-    #     cumreward_tree[0][0] = 0
-
-    #     for hi in range(self.horizon-1):
-    #         for idx, vals in self.belief_tree[hi].items():
-                
-    #             b         = vals[0]
-    #             next_idcs = vals[1]
-
-    #             for next_idx in next_idcs:    
-    #                 a    = next_idx[0]
-
-    #                 if self.arms[a] == 'known':
-    #                     b0   = b[a]
-    #                     idx1 = next_idx[1][0]
-
-    #                     cumreward_tree[hi+1][idx1] = 0
-    #                     cumreward_tree[hi+1][idx1] = cumreward_tree[hi][idx] + b0
-
-    #                 elif self.arms[a] == 'unknown':
-    #                     b0 = b[a][0]/np.sum(b[a][:])
-
-    #                     idx1 = next_idx[1][0]
-    #                     idx2 = next_idx[1][1]
-
-    #                     cumreward_tree[hi+1][idx1] = 0
-    #                     cumreward_tree[hi+1][idx1] = cumreward_tree[hi][idx] + b0
-
-    #                     cumreward_tree[hi+1][idx2] = 0
-    #                     cumreward_tree[hi+1][idx2] = cumreward_tree[hi][idx] + b0
-
-    #     for idx, vals in self.belief_tree[self.horizon-1].items():
-    #         b = vals[0]
-    #         if b[0]
-    #         cumreward_tree[self.horizon-1] += 
-
 
     def _build_qval_tree(self):
         

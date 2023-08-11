@@ -25,19 +25,16 @@ p = {
     'gamma':          0.9,
     'xi':             0.0001,
     'beta':           2,
-    'policy_type':    'softmax',
     'sequences':      False,
-    'max_seq_len':    None,
-    'constrain_seqs': True,
     'horizon':        3
 }
+
+# save path
+save_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp1/data/d_f'))
 
 xis       = np.logspace(np.log2(0.001), np.log2(1), 11, base=2)
 betas     = [1, 2, 4, 'greedy']
 horizons  = [3, 4, 5]
-
-# save path
-save_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp1/data/d_f'))
 
 def md_value():
 
@@ -62,14 +59,16 @@ def md_value():
     return out
 
 # --- Main function for replay ---
-def main(save_path):
+def main(save_folder):
     
-    if os.path.exists(save_path):
-        shutil.rmtree(save_path)
+    if os.path.exists(save_folder):
+        shutil.rmtree(save_folder)
     else: pass
-    os.makedirs(save_path)
+    os.makedirs(save_folder)
 
     md_values = md_value()
+
+    np.savetxt(os.path.join(save_path, 'xis.csv'), xis, delimiter=',')
 
     for hidx, horizon in enumerate(horizons[::-1]):
         # store results here
@@ -166,11 +165,18 @@ def main(save_path):
 
                 axv.set_xticks([])
                 axp.set_xticks([])
-                
+        
+        np.savetxt(os.path.join(save_folder, 'nreps_%u.csv'%horizon), nreps, delimiter=',')
+        np.savetxt(os.path.join(save_folder, 'root_val_%u.csv'%horizon), R, delimiter=',')
+        np.savetxt(os.path.join(save_folder, 'policy_val_%u.csv'%horizon), P, delimiter=',')
+
+        np.savetxt(os.path.join(save_folder, 'BO_val_%u.csv'%horizon), np.array([v_full]), delimiter=',')
+        np.savetxt(os.path.join(save_folder, 'CE_val_%u.csv'%horizon), np.array([md_values[hidx]]), delimiter=',')
+
         file_name = 'alpha0%u_beta0%u_alpha1%u_beta1%u_hor%u'%(alpha_0, beta_0, alpha_1, beta_1, horizon)
-        np.save(os.path.join(save_path, file_name + '.npy'), R)
-        plt.savefig(os.path.join(save_path, file_name + '.svg'), transparent=True)
-        plt.savefig(os.path.join(save_path, file_name + '.png'))
+        # np.save(os.path.join(save_folder, file_name + '.npy'), R)
+        plt.savefig(os.path.join(save_folder, file_name + '.svg'), transparent=True)
+        plt.savefig(os.path.join(save_folder, file_name + '.png'))
 
         plt.close()
 
