@@ -1,16 +1,17 @@
 from environment import Environment
 from panagent import PanAgent
 import numpy as np
-from copy import deepcopy, copy
-import os, shutil, ast
+from copy import deepcopy
+import os
+import shutil
+
 
 class AgentPOMDP(PanAgent, Environment):
 
     def __init__(self, *configs):
-        
         '''
         ----
-        configs is a list containing 
+        configs is a list containing
             [0] panagent, [1] agent, [2] environment parameters
 
         panagent parameters:
@@ -33,11 +34,11 @@ class AgentPOMDP(PanAgent, Environment):
             None
         ----
         '''
-        
+
         pag_config = configs[0]
-        ag_config  = configs[1]
+        ag_config = configs[1]
         env_config = configs[2]
-        
+
         Environment.__init__(self, **env_config)
         PanAgent.__init__(self, **pag_config)
         self.__dict__.update(**ag_config)
@@ -53,7 +54,6 @@ class AgentPOMDP(PanAgent, Environment):
         return None
 
     def _find_belief(self, z):
-
         '''
         ---
         determine whether belief state z exists in the planning tree
@@ -71,7 +71,7 @@ class AgentPOMDP(PanAgent, Environment):
 
         for hi in range(self.horizon):
             for _, vals in self.belief_tree[hi].items():
-                    
+
                 if (s == vals[0][1]) and np.array_equal(b, vals[0][0]):
                     q = vals[1]
 
@@ -80,51 +80,52 @@ class AgentPOMDP(PanAgent, Environment):
         return False, None
 
     def _simulate_trajs(self):
-
         '''
         ---
         simulate forward histrories from the agent's current belief state
-        
+
         parameters:
             None
-        
+
         returns:
-            his 
+            his
         ---
         '''
 
-        his = {hi:{} for hi in range(self.horizon)}
+        his = {hi: {} for hi in range(self.horizon)}
 
         for sim in range(self.num_sims):
-            s     = self.state # initial state
-            b     = self.M     # current belief
-            d     = 1          # counter
+            s = self.state  # initial state
+            b = self.M     # current belief
+            d = 1          # counter
 
             # check if the current belief state is already in the belief tree
             hi, k, _ = self._check_belief_exists(self.belief_tree, [b, s])
             # if not then add it
             if k not in his[hi].keys():
-                his[hi][k] = [np.full(self.num_sims, np.nan), np.full(self.num_sims, np.nan)]
-            
-            his[hi][k][0][sim] = 1 # need
-            his[hi][k][1][sim] = 0 # number of steps to reach this belief state
+                his[hi][k] = [np.full(self.num_sims, np.nan),
+                              np.full(self.num_sims, np.nan)]
+
+            his[hi][k][0][sim] = 1  # need
+            his[hi][k][1][sim] = 0  # steps to reach this belief state
 
             # start particle simulations
             while ((self.gamma**d) > 1e-4):
-                
+
                 # check if the current belief state is within the subject's horizon reach
                 check, q = self._find_belief([b, s])
 
                 # terminate the particle if beyond
                 if not check:
                     break
-                
+
                 # choose an action to perform at this belief state
                 qvals = q[s, :]
                 probs = self._policy(qvals)
-                a     = np.random.choice(range(self.num_actions), p=probs)
-                
-                # check whether the subject is uncertain about this action outcome
+                a = np.random.choice(range(self.num_actions), p=probs)
+
+                # check whether the subject is uncertain
+                # about this action outcome
                 bidx = self._check_uncertain([s, a])
                 # if yes
                 if bidx is not None:
@@ -140,38 +141,39 @@ class AgentPOMDP(PanAgent, Environment):
                     b = self._belief_plan_update(b, bidx, s, s1)
                 # if not
                 else:
-                    s1, _  = self._get_new_state(s, a, unlocked=False)
+                    s1, _ = self._get_new_state(s, a, unlocked=False)
 
                 # check if this new belief state is within the subject's horizon reach
-                hi, k, check = self._check_belief_exists(self.belief_tree, [b, s1])
+                hi, k, check = self._check_belief_exists(self.belief_tree,
+                                                         [b, s1])
 
                 # terminate the particle if beyond
                 if not check:
                     break
-                
-                # otherwise add 
+
+                # otherwise add
                 if k not in his[hi].keys():
-                    his[hi][k] = [np.full(self.num_sims, np.nan), np.full(self.num_sims, np.nan)]
+                    his[hi][k] = [np.full(self.num_sims, np.nan),
+                                  np.full(self.num_sims, np.nan)]
 
                 # update the associated values
                 curr_val = his[hi][k][0][sim]
                 if np.isnan(curr_val):
                     his[hi][k][0][sim] = self.gamma**d
                     his[hi][k][1][sim] = d
-                
-                s  = s1
+
+                s = s1
                 d += 1
 
         return his
 
     def _belief_plan_update(self, M, idx, s, s1):
-
         '''
         ---
         perform bayesian belief update
 
         parameters:
-            M   -- current belief 
+            M   -- current belief
             idx -- belief about which barrier to update
             s   -- initial physical state
             s1  -- final physical state
@@ -183,7 +185,7 @@ class AgentPOMDP(PanAgent, Environment):
 
         M_out = M.copy()
 
-        # unsuccessful 
+        # unsuccessful
         if s == s1:
             M_out[idx, 1] = 1
             M_out[idx, 0] = 0
@@ -195,7 +197,6 @@ class AgentPOMDP(PanAgent, Environment):
         return M_out
 
     def _check_belief_exists(self, btree, z):
-
         '''
         ---
         check if the belief state z already exists in the tree
@@ -221,7 +222,6 @@ class AgentPOMDP(PanAgent, Environment):
         return None, None, False
 
     def _build_belief_tree(self):
-        
         '''
         ---
         build a tree with future belief states up to horizon self.horizon
@@ -235,14 +235,14 @@ class AgentPOMDP(PanAgent, Environment):
         '''
 
         # each horizon hosts a number of belief states
-        btree = {hi:{} for hi in range(self.horizon)}
+        btree = {hi: {} for hi in range(self.horizon)}
 
         # create a merged tree -- one single tree for all information states
         idx = 0
         btree[0][idx] = [[self.M.copy(), self.state], self.Q.copy(), []]
 
         for hi in range(1, self.horizon):
-            
+
             # unique index for each belief
             idx = 0
 
@@ -250,7 +250,7 @@ class AgentPOMDP(PanAgent, Environment):
                 break
 
             for prev_idx, vals in btree[hi-1].items():
-                
+
                 # retrieve previous belief information
                 b = vals[0][0].copy()
                 s = vals[0][1]
@@ -259,76 +259,83 @@ class AgentPOMDP(PanAgent, Environment):
                 # terminate at the goal state
                 if s in self.goal_states:
                     continue
-                
+
                 for a in range(self.num_actions):
                     if ~np.isnan(self.Q[s, a]):
-                        
+
                         bidx = self._check_uncertain([s, a])
                         if bidx is not None:
 
-                            # if it's the uncertain state+action then this generates 
+                            # if it's the uncertain state+action then this generates
                             # two distinct beliefs
                             # first when the agent transitions through
                             s1u, _ = self._get_new_state(s, a, unlocked=True)
-                            b1u    = self._belief_plan_update(b, bidx, s, s1u)
+                            b1u = self._belief_plan_update(b, bidx, s, s1u)
 
                             # second when it doesn't
-                            s1l    = s
-                            b1l    = self._belief_plan_update(b, bidx, s, s)
+                            s1l = s
+                            b1l = self._belief_plan_update(b, bidx, s, s)
 
                             # check if these new beliefs already exist
-                            hiu, idxu, checku = self._check_belief_exists(btree, [b1u, s1u])
-                            hil, idxl, checkl = self._check_belief_exists(btree, [b1l, s1l])
+                            hiu, idxu, checku = self._check_belief_exists(
+                                btree, [b1u, s1u])
+                            hil, idxl, checkl = self._check_belief_exists(
+                                btree, [b1l, s1l])
 
                             # if both don't then add them to the belief tree
                             # and the new keys to the previous belief
-                            to_add = [] 
+                            to_add = []
                             if not checku and not checkl:
                                 if b[bidx, 0] != 0:
-                                    btree[hi][idx]        = [[b1u.copy(), s1u], q.copy(), []]
-                                    to_add               += [[a, hi, idx]]
+                                    btree[hi][idx] = [[b1u.copy(), s1u],
+                                                      q.copy(), []]
+                                    to_add += [[a, hi, idx]]
                                 if b[bidx, 1] != 0:
-                                    btree[hi][idx+1]      = [[b1l.copy(), s1l], q.copy(), []]
-                                    to_add               += [[a, hi, idx+1]]
-                                
+                                    btree[hi][idx+1] = [[b1l.copy(), s1l],
+                                                        q.copy(), []]
+                                    to_add += [[a, hi, idx+1]]
+
                                 btree[hi-1][prev_idx][2] += [to_add]
-                                idx                      += len(to_add)
+                                idx += len(to_add)
 
                             elif not checku and checkl:
                                 if b[bidx, 0] != 0:
-                                    btree[hi][idx]        = [[b1u.copy(), s1u], q.copy(), []]
-                                    to_add               += [[a, hi, idx]]
-                                    idx                  += 1
-                                to_add                   += [[a, hil, idxl]]
+                                    btree[hi][idx] = [[b1u.copy(), s1u],
+                                                      q.copy(), []]
+                                    to_add += [[a, hi, idx]]
+                                    idx += 1
+                                to_add += [[a, hil, idxl]]
                                 btree[hi-1][prev_idx][2] += [to_add]
 
                             elif checku and not checkl:
                                 to_add += [[a, hiu, idxu]]
                                 if b[bidx, 1] != 0:
-                                    btree[hi][idx]        = [[b1l.copy(), s1l], q.copy(), []]
-                                    to_add               += [[a, hi, idx]]
-                                    idx                  += 1
+                                    btree[hi][idx] = [[b1l.copy(), s1l],
+                                                      q.copy(), []]
+                                    to_add += [[a, hi, idx]]
+                                    idx += 1
                                 btree[hi-1][prev_idx][2] += [to_add]
                             else:
-                                # if both exist then add their existing keys 
+                                # if both exist then add their existing keys
                                 to_add = [[a, hiu, idxu], [a, hil, idxl]]
                                 if (to_add not in btree[hi-1][prev_idx][2]):
                                     btree[hi-1][prev_idx][2] += [to_add]
-                            # if the new belief already exists then we just need to add 
+                            # if the new belief already exists then we just need to add
                             # the key of that existing belief to the previous belief
 
                         else:
                             s1u, _ = self._get_new_state(s, a, unlocked=False)
-                            b1u    = b.copy()
+                            b1u = b.copy()
 
                             # check if this belief already exists
-                            hip, idxp, check = self._check_belief_exists(btree, [b1u, s1u])
+                            hip, idxp, check = self._check_belief_exists(
+                                btree, [b1u, s1u])
                             # if it doesn't exist then add it to the belief tree
                             # and add its key to the previous belief that gave rise to it
                             if not check:
-                                btree[hi][idx]            = [[b1u.copy(), s1u], q.copy(), []]
+                                btree[hi][idx] = [[b1u.copy(), s1u], q.copy(), []]
                                 btree[hi-1][prev_idx][2] += [[[a, hi, idx]]]
-                                idx                      += 1
+                                idx += 1
                             # if the new belief already exists then we just need to add 
                             # the key of that existing belief to the previous belief
                             else:
@@ -338,10 +345,9 @@ class AgentPOMDP(PanAgent, Environment):
         return btree
 
     def _get_state_state(self, b, Q):
-
         '''
         ---
-        marginalise T[s, a, s'] over actions with the current policy 
+        marginalise T[s, a, s'] over actions with the current policy
 
         parameters:
             b -- current belief about transition structure
@@ -351,7 +357,7 @@ class AgentPOMDP(PanAgent, Environment):
             T -- state-state transition matrix under \pi
         ---
         '''
-        Ta     = np.zeros((self.num_states, self.num_actions, self.num_states))
+        Ta = np.zeros((self.num_states, self.num_actions, self.num_states))
         for s in range(self.num_states):
             for a in range(self.num_actions):
                 s1l, _ = self._get_new_state(s, a, unlocked=False)
@@ -360,7 +366,7 @@ class AgentPOMDP(PanAgent, Environment):
                 if bidx is not None:
 
                     s1u, _ = self._get_new_state(s, a, unlocked=True)
-                
+
                     Ta[s, a, s1u] = b[bidx, 0]/np.sum(b[bidx, :])
                     Ta[s, a, s1l] = b[bidx, 1]/np.sum(b[bidx, :])
 
@@ -377,19 +383,18 @@ class AgentPOMDP(PanAgent, Environment):
         return T
 
     def _build_pneed_tree(self):
-
         '''
         ---
         Compute Need for each belief state
 
-        ttree -- tree with the estimated probabilities 
+        ttree -- tree with the estimated probabilities
         ---
         '''
 
         # here is the picture:
         #
         #                -
-        #               / 
+        #               /
         #              X
         #             / \
         #            /   -
@@ -402,60 +407,59 @@ class AgentPOMDP(PanAgent, Environment):
         #
         # A is the agent's current state
         # X is the belief at which an update is executed
-        # 
-        # The path to X is estimated based on 
-        # monte-carlo returns in the method called 
+        #
+        # The path to X is estimated based on
+        # monte-carlo returns in the method called
         # simulate_trajs()
 
         ttree = self._simulate_trajs()
 
-        ntree = {hi:{} for hi in range(self.horizon)}
+        ntree = {hi: {} for hi in range(self.horizon)}
 
         for hi in range(self.horizon):
-            
+
             for k, vals in self.belief_tree[hi].items():
-                
+
                 ntree[hi][k] = 0
 
                 if k not in ttree[hi].keys():
                     continue
 
-                b     = self.belief_tree[hi][k][0][0]
-                s     = self.belief_tree[hi][k][0][1]
-                Q     = self.belief_tree[hi][k][1].copy()
-                T     = self._get_state_state(b, Q)
-                SR_k  = np.linalg.inv(np.eye(self.num_states) - self.gamma*T)
+                b = self.belief_tree[hi][k][0][0]
+                s = self.belief_tree[hi][k][0][1]
+                Q = self.belief_tree[hi][k][1].copy()
+                T = self._get_state_state(b, Q)
+                SR_k = np.linalg.inv(np.eye(self.num_states) - self.gamma*T)
 
-                bn      = ttree[hi][k][0]
-                bp      = ttree[hi][k][1]
+                bn = ttree[hi][k][0]
+                bp = ttree[hi][k][1]
 
                 maskedn = bn[~np.isnan(bn)]
                 maskedp = bp[~np.isnan(bn)]
-                
-                av_SR   = 0
-                
+
+                av_SR = 0
+
                 for idx in range(len(maskedn)):
-                    
+
                     SR = SR_k.copy()
-                    
+
                     for i in range(int(maskedp[idx])+1):
                         SR -= (self.gamma**i)*np.linalg.matrix_power(T, i)
 
                     av_SR += maskedn[idx] + SR[self.state, s]
-                
+
                 ntree[hi][k] += av_SR/self.num_sims
 
         return ntree
 
     def _imagine_update(self, Q_old, state, b, val, btree):
-        
         '''
         ---
-        propose a model-based update to a model-free value at a single belief state 
+        propose a model-based update to a model-free value at a single belief state
 
         parameters:
             Q_old -- current MF value
-            state -- physical location 
+            state -- physical location
             b     -- belief
             val   -- index
             btree -- belief tree
@@ -469,52 +473,58 @@ class AgentPOMDP(PanAgent, Environment):
 
         tds = []
 
-        # if there are two belief states to which the subject can transition from the 
+        # if there are two belief states to which the subject can transition from the
         # current belief state, it means that this action's outcome is uncertain
         if len(val) == 2:
-            
+
             # retrieve next belief states' indices
             a, hiu, idxu = val[0][0], val[0][1], val[0][2]
             _, hil, idxl = val[1][0], val[1][1], val[1][2]
 
             # s1u -- new state with unlocked barrier
-            s1u          = btree[hiu][idxu][0][1]
-            q_prime_u    = btree[hiu][idxu][1][s1u, :].copy()
+            s1u = btree[hiu][idxu][0][1]
+            q_prime_u = btree[hiu][idxu][1][s1u, :].copy()
 
             # s1l -- new state with locked barrier
-            s1l          = btree[hil][idxl][0][1]
-            q_prime_l    = btree[hil][idxl][1][s1l, :].copy()
+            s1l = btree[hil][idxl][0][1]
+            q_prime_l = btree[hil][idxl][1][s1l, :].copy()
 
             # reward for new location (old location is just 0)
             y, x = self._convert_state_to_coords(s1u)
-            rew  = self.config[y, x]
+            rew = self.config[y, x]
 
             # add temporal difference errors for both updates
-            tds += [q_old_vals[a] + self.alpha_r*(rew + self.gamma*np.nanmax(q_prime_u) - q_old_vals[a])]
-            tds += [q_old_vals[a] + self.alpha_r*(0 + self.gamma*np.nanmax(q_prime_l) - q_old_vals[a])]
+            tds += [q_old_vals[a] +
+                    self.alpha_r *
+                    (rew + self.gamma*np.nanmax(q_prime_u) - q_old_vals[a])]
+            tds += [q_old_vals[a] +
+                    self.alpha_r *
+                    (0 + self.gamma*np.nanmax(q_prime_l) - q_old_vals[a])]
 
         # otherwise there's only one possible next belief state
         else:
             a, hi1, idx1 = val[0][0], val[0][1], val[0][2]
-            s1           = btree[hi1][idx1][0][1]
-            q_prime      = btree[hi1][idx1][1][s1, :].copy()
+            s1 = btree[hi1][idx1][0][1]
+            q_prime = btree[hi1][idx1][1][s1, :].copy()
 
             y, x = self._convert_state_to_coords(s1)
-            rew  = self.config[y, x]
-            tds += [q_old_vals[a] + self.alpha_r*(rew + self.gamma*np.nanmax(q_prime) - q_old_vals[a])]
+            rew = self.config[y, x]
+            tds += [q_old_vals[a] +
+                    self.alpha_r *
+                    (rew + self.gamma*np.nanmax(q_prime) - q_old_vals[a])]
 
         # get the new (updated) q value
-        Q_new      = Q_old.copy()
+        Q_new = Q_old.copy()
         q_new_vals = q_old_vals.copy()
 
         # perform the update
-        if len(tds) != 2: 
+        if len(tds) != 2:
             q_new_vals[a] = tds[0]
-        else:    
+        else:
             bidx = self._check_uncertain([state, a])
-            b0   = b[bidx, 0]/np.sum(b[bidx, :])
-            b1   = 1 - b[bidx, 0]/np.sum(b[bidx, :])
-            # weighted by the subject's prior belief 
+            b0 = b[bidx, 0]/np.sum(b[bidx, :])
+            b1 = 1 - b[bidx, 0]/np.sum(b[bidx, :])
+            # weighted by the subject's prior belief
             q_new_vals[a] = b0*tds[0] + b1*tds[1]
 
         Q_new[state, :] = q_new_vals
@@ -522,13 +532,12 @@ class AgentPOMDP(PanAgent, Environment):
         return Q_new
 
     def _generate_forward_sequences(self, updates):
-
         '''
         ---
-        generates forward replay sequences 
+        generates forward replay sequences
 
         parameters:
-            updates     -- single-action replay updates to extend 
+            updates     -- single-action replay updates to extend
             pntree      -- need
 
         retuns:
@@ -541,18 +550,18 @@ class AgentPOMDP(PanAgent, Environment):
         # iterate over all single-action updates
         for update in updates:
             for l in range(self.max_seq_len-1):
-                
+
                 if l == 0:
                     pool = [update]
                 else:
                     pool = deepcopy(tmp)
 
-                tmp  = []
-                
-                for seq in pool: # take an existing (current) sequence
-                    
-                    lhi   = seq[0][-1]
-                    levb  = seq[-1][-1]
+                tmp = []
+
+                for seq in pool:  # take an existing (current) sequence
+
+                    lhi = seq[0][-1]
+                    levb = seq[-1][-1]
 
                     if levb < self.xi:
                         continue
@@ -560,8 +569,8 @@ class AgentPOMDP(PanAgent, Environment):
                     if lhi == (self.horizon - 2):
                         continue
 
-                    lidx      = seq[1][-1]
-                    la        = seq[2][-1, 1]
+                    lidx = seq[1][-1]
+                    la = seq[2][-1, 1]
                     next_idcs = self.belief_tree[lhi][lidx][2]
 
                     tt = []
@@ -575,47 +584,49 @@ class AgentPOMDP(PanAgent, Environment):
 
                     for next_idx in next_idcs:
 
-                        nhi  = next_idx[1]
+                        nhi = next_idx[1]
                         nidx = next_idx[2]
 
                         if la == next_idx[0]:
 
                             vals = self.belief_tree[nhi][nidx]
-                            s        = vals[0][1]
+                            s = vals[0][1]
                             if s in self.goal_states:
                                 continue
-                            b        = vals[0][0].copy()
+                            b = vals[0][0].copy()
 
                             if s not in seq[2][:, 0]:
-                            
-                                Q_old  = vals[1].copy()
+
+                                Q_old = vals[1].copy()
 
                                 next_next_idcs = vals[2]
 
                                 for next_next_idx in next_next_idcs:
-                                    
+
                                     this_seq = deepcopy(seq)
                                     Q = this_seq[3].copy()
 
-                                    Q_new  = self._imagine_update(Q_old, s, b, next_next_idx, self.belief_tree)
+                                    Q_new = self._imagine_update(
+                                        Q_old, s, b, next_next_idx, self.belief_tree)
 
                                     # need   = self.pneed_tree[s]
                                     # gain   = self._compute_gain(Q_old[s, :].copy(), Q_new[s, :].copy())
                                     # evb    = gain * need
-                                    a          = next_next_idx[0][0]
-                                    gain, evb  = self._generalised_gain(s, a, Q_old, Q_new, self.belief_tree)
+                                    a = next_next_idx[0][0]
+                                    gain, evb = self._generalised_gain(
+                                        s, a, Q_old, Q_new, self.belief_tree)
 
                                     if evb >= self.xi:
-                                        this_seq[0]  = np.append(this_seq[0], nhi)
-                                        this_seq[1]  = np.append(this_seq[1], nidx)
-                                        a            = next_next_idx[0][0]
-                                        this_seq[2]  = np.vstack((this_seq[2], np.array([s, a])))
-                                        Q[s, :]      = Q_new[s, :].copy()
-                                        this_seq[3]  = Q.copy()
-                                        this_seq[4]  = np.append(this_seq[4], gain.copy())
-                                        this_seq[5]  = np.append(this_seq[5], self.pneed_tree.copy())
-                                        this_seq[6]  = np.append(this_seq[6], np.sum(this_seq[6])+evb)
-                                        tmp         += [deepcopy(this_seq)]
+                                        this_seq[0] = np.append(this_seq[0], nhi)
+                                        this_seq[1] = np.append(this_seq[1], nidx)
+                                        a = next_next_idx[0][0]
+                                        this_seq[2] = np.vstack((this_seq[2], np.array([s, a])))
+                                        Q[s, :] = Q_new[s, :].copy()
+                                        this_seq[3] = Q.copy()
+                                        this_seq[4] = np.append(this_seq[4], gain.copy())
+                                        this_seq[5] = np.append(this_seq[5], self.pneed_tree.copy())
+                                        this_seq[6] = np.append(this_seq[6], np.sum(this_seq[6])+evb)
+                                        tmp += [deepcopy(this_seq)]
 
                 if len(tmp) > 0:
                     seq_updates += tmp
@@ -628,19 +639,19 @@ class AgentPOMDP(PanAgent, Environment):
 
         for update in updates:
             for l in range(self.max_seq_len-1):
-                
+
                 if l == 0:
                     pool = [update]
                 else:
                     pool = deepcopy(tmp)
 
-                tmp  = []
-                
-                for seq in pool: # take an existing sequence
-                    
-                    lhi   = seq[0][-1]
-                    lidx  = seq[1][-1]
-                    levb  = seq[-1][-1]
+                tmp = []
+
+                for seq in pool:  # take an existing sequence
+
+                    lhi = seq[0][-1]
+                    lidx = seq[1][-1]
+                    levb = seq[-1][-1]
 
                     if levb < self.xi:
                         continue
