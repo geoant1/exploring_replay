@@ -1,3 +1,5 @@
+**/--enable-proposed-api
+**/__pycache__
 **/archive
 **/rldm2022/
 **/actual_paper
