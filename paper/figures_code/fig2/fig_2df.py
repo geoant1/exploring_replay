@@ -19,9 +19,8 @@ M = {
 p = {
     'arms':           ['unknown', 'known'],
     'root_belief':    M,
-    'init_qvals':     0.6,
     'rand_init':      False,
-    'gamma':          0.8,
+    'gamma':          0.90,
     'xi':             0.0001,
     'beta':           2,
     'sequences':      False,
@@ -31,7 +30,8 @@ p = {
 # save path
 save_path = os.path.abspath(os.path.join(sys.path[0], '../../figures/fig2/data/d_f'))
 
-xis       = np.logspace(np.log2(0.001), np.log2(1), 11, base=2)
+# xis       = np.linspace(1e-10, 1, 11)
+xis       = np.logspace(np.log10(1e-10), np.log10(1), 11, base=10)
 betas     = [1, 2, 4, 'greedy']
 horizons  = [3, 4, 5]
 
@@ -41,7 +41,7 @@ def md_value():
     x   = deepcopy(p)
     for idx, horizon in enumerate(horizons[::-1]):
 
-        x['horizon'] = horizon
+        x['horizon']     = horizon
         x['root_belief'] = {0: 0.50, 
                             1: 0.51}
         x['arms'] = ['known', 'known']
@@ -99,8 +99,9 @@ def main(save_folder):
                 # do replay
                 _, _, _, replays = tree.replay_updates()
                 qvals            = tree.qval_tree[0][0]
-                v_replay         = tree._value(qvals)
 
+                tree.beta = 'greedy'
+                v_replay         = tree._value(qvals)
                 eval_pol         = tree.evaluate_policy(tree.qval_tree)
 
                 P[bidx, xidx]     = eval_pol
@@ -115,7 +116,7 @@ def main(save_folder):
 
         for bidx, beta in enumerate(betas): 
             if beta == 'greedy':
-                lab = 'greedy'
+                lab = 'Greedy'
             else:
                 lab = r'$\beta=$%s'%beta
 
@@ -138,29 +139,29 @@ def main(save_folder):
                 axp.axhline(v_full, linestyle='--', color='k', alpha=0.7, label='BO value')
                 axp.axhline(md_values[hidx], linestyle='--', color='r', alpha=0.7, label='CE value')
 
-                axr.legend(prop={'size': 9})
-                axv.legend(prop={'size': 9})
-                axp.legend(prop={'size': 9})
+                axr.legend(prop={'size': 7})
+                axv.legend(prop={'size': 7})
+                axp.legend(prop={'size': 7})
                 # axp.legend(prop={'size': 13})
                 # axr.legend(prop={'size': 13})
 
-                axv.set_ylabel('Root value', fontsize=12)
+                axv.set_ylabel('Greedy root value', fontsize=10)
                 axv.set_ylim(0, R_true+1)
-                axv.tick_params(axis='y', labelsize=11)
+                axv.tick_params(axis='y', labelsize=10)
 
-                axp.set_ylabel('Policy value', fontsize=12)
+                axp.set_ylabel('Greedy policy value', fontsize=10)
                 axp.set_ylim(R_true-1, R_true+0.5)
-                axp.tick_params(axis='y', labelsize=11)
+                axp.tick_params(axis='y', labelsize=10)
 
                 if horizon == 5:
                     max_reps = np.max(nreps[:])
 
-                axr.set_ylabel('Number of updates', fontsize=12)
+                axr.set_ylabel('Number of updates', fontsize=10)
                 axr.tick_params(axis='y', labelsize=10)
                 axr.set_ylim(0, max_reps+6)
 
-                axr.set_xlabel(r'$\xi$', fontsize=12)
-                axr.set_xticks(range(R.shape[1]), ['%.4f'%i for i in xis[::-1]], rotation=60, fontsize=10)
+                axr.set_xlabel(r'$\xi$', fontsize=10)
+                axr.set_xticks(range(0, R.shape[1], 2), [r'$10^{%u}$'%x for x in range(-10, 1, 2)][::-1], fontsize=10)
 
                 axv.set_xticks([])
                 axp.set_xticks([])

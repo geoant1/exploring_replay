@@ -23,7 +23,7 @@ p = {
     'rand_init':      False,
     'gamma':          0.90,
     'xi':             0.0001,
-    'beta':           2,
+    'beta':           1,
     'sequences':      False,
     'horizon':        2
 }

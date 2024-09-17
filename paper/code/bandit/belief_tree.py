@@ -258,8 +258,9 @@ class Tree:
         # set the leaf values as certainty-equivalent reward
         for hi in range(self.horizon):
             for idx, vals in self.belief_tree[hi].items():
+                b  = vals[0]
                 if (hi == self.horizon - 1):
-                    b  = vals[0]
+                    # b  = vals[0]
 
                     if self.arms[0] == 'known':
                         b0 = b[0]
@@ -279,6 +280,17 @@ class Tree:
                 else:
                     b0 = 0.0
                     b1 = 0.0
+                    # if self.arms[0] == 'known':
+                    #     b0 = b[0]
+                    # elif self.arms[0] == 'unknown':
+                    #     b0 = b[0][0]/np.sum(b[0])
+                    
+
+
+                    # if self.arms[1] == 'known':
+                    #     b1 = b[1]
+                    # elif self.arms[1] == 'unknown':
+                    #     b1 = b[1][0]/np.sum(b[1])
                 qval_tree[hi][idx] = np.array([b0, b1])
 
         return qval_tree

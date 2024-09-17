@@ -21,7 +21,7 @@ p = {
     'arms':           ['unknown', 'known'],
     'root_belief':    M,
     'rand_init':      False,
-    'gamma':          0.8,
+    'gamma':          0.9,
     'xi':             0.0001,
     'beta':           1,
     'sequences':      False,
