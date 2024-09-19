@@ -20,7 +20,6 @@ M = {
 p = {
     'arms':           ['unknown', 'unknown'],
     'root_belief':    M,
-    'init_qvals':     0.6,
     'rand_init':      False,
     'gamma':          0.9,
     'xi':             0.0001,
@@ -100,6 +99,8 @@ def main(save_folder):
                 # do replay
                 _, _, _, replays = tree.replay_updates()
                 qvals            = tree.qval_tree[0][0]
+
+                tree.beta = 'greedy'
                 v_replay         = tree._value(qvals)
 
                 eval_pol         = tree.evaluate_policy(tree.qval_tree)
@@ -139,24 +140,22 @@ def main(save_folder):
                 axp.axhline(v_full, linestyle='--', color='k', alpha=0.7, label='BO value')
                 axp.axhline(md_values[hidx], linestyle='--', color='r', alpha=0.7, label='CE value')
 
-                axr.legend(prop={'size': 9})
-                axv.legend(prop={'size': 9})
-                axp.legend(prop={'size': 9})
-                # axp.legend(prop={'size': 13})
-                # axr.legend(prop={'size': 13})
+                axr.legend(prop={'size': 7})
+                axv.legend(prop={'size': 7})
+                axp.legend(prop={'size': 7})
 
-                axv.set_ylabel('Root value', fontsize=12)
+                axv.set_ylabel('Greedy root value', fontsize=10)
                 axv.set_ylim(0, R_true+1)
-                axv.tick_params(axis='y', labelsize=11)
+                axv.tick_params(axis='y', labelsize=10)
 
-                axp.set_ylabel('Policy value', fontsize=12)
+                axp.set_ylabel('Greedy policy value', fontsize=10)
                 axp.set_ylim(R_true-1, R_true+0.5)
-                axp.tick_params(axis='y', labelsize=11)
+                axp.tick_params(axis='y', labelsize=10)
 
                 if horizon == 5:
                     max_reps = np.max(nreps[:])
 
-                axr.set_ylabel('Number of updates', fontsize=12)
+                axr.set_ylabel('Number of updates', fontsize=10)
                 axr.tick_params(axis='y', labelsize=10)
                 axr.set_ylim(0, max_reps+6)
 

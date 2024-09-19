@@ -20,7 +20,6 @@ M = {
 p = {
     'arms':           ['unknown', 'unknown'],
     'root_belief':    M,
-    'init_qvals':     0.6,
     'rand_init':      False,
     'gamma':          0.9,
     'xi':             0.0001,
