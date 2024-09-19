@@ -48,7 +48,7 @@ pip install -r requirements.txt
 ```
 ## Running
 
-???
+After the necessary installations, the individual scripts present in `paper/figures_code` can be run to generate the figures in the paper.
 
 # License
 This projected is covered by the **MIT license**
