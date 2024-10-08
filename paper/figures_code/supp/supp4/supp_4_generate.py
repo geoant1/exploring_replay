@@ -35,13 +35,13 @@ save_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/sup
 # --- Main function for replay ---
 def main(save_folder):
     
-    num_trees = 200
+    num_trees = 1000
 
     seqs      = [True, False]
 
-    for seq in seqs:
+    np.random.seed(0)
 
-        np.random.seed(0)
+    for seq in seqs:
 
         for tidx in range(num_trees):
 
@@ -60,7 +60,7 @@ def main(save_folder):
 
             np.save(os.path.join(this_save_path, 'need_history.npy'), n_history)
             np.save(os.path.join(this_save_path, 'qval_history.npy'), q_history)
-            np.save(os.path.join(this_save_path, 'replay_history.npy'), replays)
+            np.save(os.path.join(this_save_path, 'replay_history.npy'), np.asarray(replays, dtype='object'))
 
             print('Done with tree %u/%u'%(tidx+1, num_trees))
 

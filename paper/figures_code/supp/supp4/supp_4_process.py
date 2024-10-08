@@ -9,7 +9,7 @@ from scipy.stats import ttest_ind, ttest_1samp
 # save path
 save_path = os.path.abspath(os.path.join(sys.path[0], '../../../figures/supp/supp4/'))
 
-num_trees = 100
+num_trees = 1000
 seqs      = [True, False]
 
 # --- Main function for replay ---
