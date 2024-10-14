@@ -1,17 +1,17 @@
 import os, shutil, sys
 
-home_dir = '/home/gantonov/projects/exploring_replay/'
-work_dir = os.path.join(home_dir, 'code')
+home_dir = '/home/gantonov/projects/exploring_replay/paper/'
+work_dir = os.path.join(home_dir, 'figures_code', 'supp', 'supp4')
 logs_dir = os.path.join(home_dir, 'cluster', 'logs')
 
 sys.path.append(work_dir)
 
-job_name = 'trees.sh'
+job_name = 'process_trees.sh'
 job_file = os.path.join(os.getcwd(), job_name)
 
 with open(job_file, 'w') as fh:
     fh.writelines("#!/bin/bash -l\n")
-    fh.writelines("#SBATCH -J trees.sh\n")
+    fh.writelines("#SBATCH -J process_trees.sh\n")
     fh.writelines("#SBATCH -o " + os.path.join(logs_dir, 'job.out.%j') + "\n")
     fh.writelines("#SBATCH -e " + os.path.join(logs_dir, 'job.err.%j') + "\n")
     fh.writelines("#SBATCH --exclusive=user\n")
