@@ -10,5 +10,5 @@
 #SBATCH --mem-per-cpu=200
 #SBATCH --time=3-24:00:00
 module purge
-conda activate dist
-srun python ./supp_4_generate_cluster.py
+conda activate replay
+srun python ./supp_4_generate.py
