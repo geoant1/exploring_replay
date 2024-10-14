@@ -9,6 +9,5 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=200
 #SBATCH --time=3-24:00:00
-module purge
 conda activate replay
 srun python ./supp_4_generate.py
