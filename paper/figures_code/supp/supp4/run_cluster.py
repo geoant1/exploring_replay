@@ -1,7 +1,7 @@
 import os, shutil, sys
 
-home_dir = '/home/gantonov/projects/exploring_replay/'
-work_dir = os.path.join(home_dir, 'code')
+home_dir = '/home/gantonov/projects/exploring_replay/paper'
+work_dir = os.path.join(home_dir, 'figures_code', 'supp', 'supp4')
 logs_dir = os.path.join(home_dir, 'cluster', 'logs')
 
 sys.path.append(work_dir)

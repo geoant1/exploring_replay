@@ -62,7 +62,8 @@ def main(save_folder):
             np.save(os.path.join(this_save_path, 'qval_history.npy'), q_history)
             np.save(os.path.join(this_save_path, 'replay_history.npy'), np.asarray(replays, dtype='object'))
 
-            print('Done with tree %u/%u'%(tidx+1, num_trees))
+            if tidx%100 == 0:
+                print('Done with tree %u/%u'%(tidx+1, num_trees), flush=True)
 
     return None
 
